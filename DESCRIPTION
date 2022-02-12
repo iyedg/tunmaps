@@ -1,11 +1,18 @@
 Package: tunmaps
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Administrative Boundaries of Tunisia
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Author: Iyed Ghedamsi
+Maintainer: Iyed Ghedamsi <contact@iyedg.me>
+Description: Administrative Boundaries of Tunisia at several levels
+    (Governorates, Delegations, Municipalities and Sectors) based on open data
+    from various Tunisian ministries as well as researchers.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Depends: 
+    R (>= 2.10)
+RoxygenNote: 7.1.2
+Imports: 
+    ggplot2,
+    sf
