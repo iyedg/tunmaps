@@ -11,5 +11,4 @@ tun_governorates <- dplyr::rename(
   name_gov_fr = gov_name_f
 )
 
-
 usethis::use_data(tun_governorates, overwrite = TRUE, compress = "xz")
