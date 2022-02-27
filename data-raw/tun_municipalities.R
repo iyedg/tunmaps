@@ -58,7 +58,7 @@ matched_df <- gov_ids %>%
   bind_rows()
 
 
-clean_tun_municipalities <- tun_municipalities %>%
+tun_municipalities <- tun_municipalities %>%
   left_join(matched_df, by = c(name_ar_mun = "source.name")) %>%
   left_join(mun_official %>% rename(target.name = nom_municipalite_ar)) %>%
   select(-name_ar_mun) %>%
