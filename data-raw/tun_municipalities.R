@@ -11,20 +11,17 @@ if (!fs::file_exists(tun_municipalities_path)) {
   download.file(municipalities_geojson_url, tun_municipalities_path)
 }
 
-sf::read_sf(tun_municipalities_path) %>% colnames()
-
 tun_municipalities <- dplyr::rename(
-    sf::read_sf(tun_municipalities_path),
-    name_mun_ar = NAME_EN_AR,
-    name_gov_ar = gouv_name_ar,
-    gov_id = C_GOUV
-  ) %>%
-  mutate(gov_id = as.numeric(gov_id))
+  sf::read_sf(tun_municipalities_path),
+  name_ar_mun = NAME_EN_AR,
+  name_fr_mun = NAME_EN,
+  id_gov = C_GOUV
+) %>%
+  mutate(id_gov = as.numeric(id_gov))
 
 
 tun_municipalities_names <- tun_municipalities %>%
-  distinct(gov_id, name_mun_ar) %>%
-  rename(mun_name = name_mun_ar)
+  distinct(id_gov, name_ar_mun)
 
 official_mun_names <- mun_official %>%
   distinct(code_gouvernorat, nom_municipalite_ar, nom_gouvernorat_ar) %>%
@@ -41,41 +38,41 @@ match_gov_muns <- function(governorate_id) {
     filter(gov_id == governorate_id)
 
   tun_municipalities_names_subset <- tun_municipalities_names %>%
-    filter(gov_id == governorate_id)
+    filter(id_gov == governorate_id)
 
   matches <- match_lists(
     target.names = official_mun_names_subset %>% pull(mun_name),
-    source.names = tun_municipalities_names_subset %>% pull(mun_name)
+    source.names = tun_municipalities_names_subset %>% pull(name_ar_mun)
   )
 
   matches
 }
 
-gov_ids <- official_mun_names %>% distinct(gov_id) %>% pull(gov_id)
+gov_ids <- official_mun_names %>%
+  distinct(gov_id) %>%
+  pull(gov_id)
 
 
 matched_df <- gov_ids %>%
   purrr::map(match_gov_muns) %>%
   bind_rows()
 
-matched_df %>% filter(dist > 0) %>% arrange(desc(dist)) %>% View()
 
 clean_tun_municipalities <- tun_municipalities %>%
-  left_join(matched_df, by = c(name_mun_ar = "source.name")) %>%
+  left_join(matched_df, by = c(name_ar_mun = "source.name")) %>%
   left_join(mun_official %>% rename(target.name = nom_municipalite_ar)) %>%
+  select(-name_ar_mun) %>%
   rename(
-    mun_name = target.name,
+    name_ar_mun = target.name,
     gov_name = nom_gouvernorat_ar,
-    mun_id = code_municipalite
+    id_mun = code_municipalite
   ) %>%
-  mutate(
-    area = as.numeric(area),
-    chairs = as.numeric(chairs)
-  ) %>%
-  select(mun_id, mun_name, gov_id, gov_name, state, chairs, area, population_valeur, geometry)
-
-ggplot2::ggplot(clean_tun_municipalities) + ggplot2::geom_sf(ggplot2::aes(fill = chairs))
-
-tun_municipalities <- clean_tun_municipalities
+  select(
+    id_gov,
+    id_mun,
+    name_ar_mun,
+    name_fr_mun,
+    geometry
+  )
 
 usethis::use_data(tun_municipalities, overwrite = TRUE, compress = "xz")
