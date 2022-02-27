@@ -3,7 +3,7 @@ source("data-raw/utils.R")
 
 mun_official <- readr::read_csv2("http://data.collectiviteslocales.gov.tn/wp-content/uploads/sites/20/2021/05/Mun_population2020.csv")
 
-tun_municipalities_path <- fs::path("data-raw", "tun_municipalities.geojson")
+tun_municipalities_path <- fs::path("data-raw", "raw", "tun_municipalities.geojson")
 
 if (!fs::file_exists(tun_municipalities_path)) {
   # Source: https://www.data4tunisia.org/en/datasets/decoupage-de-la-tunisie-en-municipalites-geojson/
